@@ -45,7 +45,7 @@ def get_all_listings(urls, driver):
         listings = get_listings(raw_html)
 
         listings_list.append(listings)
-        return listings_list
+    return listings_list
 
 
 def filter_html(soup):
