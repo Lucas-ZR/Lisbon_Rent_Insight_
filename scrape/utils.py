@@ -4,6 +4,8 @@ import random
 from time import sleep
 from math import ceil
 
+from datetime import datetime, timezone
+
 
 def get_page_count(raw_html):
     # input raw_html, return int with number of pages containing listings
@@ -29,29 +31,23 @@ def get_listings(raw_html):
     # input raw_html, return BeautifulSoup object with all the items
     soup = BeautifulSoup(raw_html, "html.parser")
     container = soup.find(class_="items-container")
-    return container
+
+    validation_status = validate_page(soup)
+    return container, validation_status
 
 
-def get_all_listings(urls, driver):
-    listings_list = []
-    for url in urls:
-        # if first url, it is already loaded in the driver no need to load again, first url always ends on literal /
-        if url[-1] != "/":
-            driver.get(url)
-            sleep(random.randint(7, 15))
-
-        raw_html = driver.page_source
-
-        listings = get_listings(raw_html)
-
-        listings_list.append(listings)
-    return listings_list
+def validate_page(soup):
+    # every listing is a "data-element-id article" which contains "item-detail class" checking both to determine if valid page
+    has_articles = len(soup.find_all("article", attrs={"data-element-id": True})) > 0
+    has_detail = soup.find("span", class_="item-detail") is not None
+    return has_articles and has_detail
 
 
-def filter_html(soup):
+def filter_html(soup, freguesia):
     articles = soup.find_all("article", attrs={"data-element-id": True})
 
     listings = []
+    scraped_at = datetime.now(timezone.utc).isoformat()
 
     for art in articles:
         announcement_id = art["data-element-id"]
@@ -59,9 +55,12 @@ def filter_html(soup):
             "span", class_="item-price h2-simulated"
         ).get_text(strip=True)
         announcement_title = art.find("a", class_="item-link")["title"]
-        announcement_extra = art.find("div", class_="item-detail-char").find_all(
-            "span", class_="item-detail"
-        )
+        announcement_extra = [
+            span.get_text(strip=True)
+            for span in art.find("div", class_="item-detail-char").find_all(
+                "span", class_="item-detail"
+            )
+        ]
 
         listings.append(
             {
@@ -69,7 +68,13 @@ def filter_html(soup):
                 "price": announcement_price,
                 "title": announcement_title,
                 "extra": announcement_extra,
+                "freguesia": freguesia ,
+                "scraped_at": scraped_at,
             }
         )
 
     return listings
+
+
+def get_freguesia(url):
+    return url.split('/')[5]
