@@ -1,10 +1,8 @@
 from bs4 import BeautifulSoup
 
 import random
-from time import sleep
 from math import ceil
 
-from datetime import datetime, timezone
 
 
 def get_page_count(raw_html):
@@ -28,7 +26,7 @@ def make_page_urls(pages, freguesia_url):
 
 
 def get_listings(raw_html):
-    # input raw_html, return BeautifulSoup object with all the items
+    # input raw_html, return BeautifulSoup object with all the items, and scrape_status
     soup = BeautifulSoup(raw_html, "html.parser")
     container = soup.find(class_="items-container")
 
@@ -47,7 +45,6 @@ def filter_html(soup, freguesia):
     articles = soup.find_all("article", attrs={"data-element-id": True})
 
     listings = []
-    scraped_at = datetime.now(timezone.utc).isoformat()
 
     for art in articles:
         announcement_id = art["data-element-id"]
@@ -68,8 +65,7 @@ def filter_html(soup, freguesia):
                 "price": announcement_price,
                 "title": announcement_title,
                 "extra": announcement_extra,
-                "freguesia": freguesia ,
-                "scraped_at": scraped_at,
+                "freguesia": freguesia
             }
         )
 
