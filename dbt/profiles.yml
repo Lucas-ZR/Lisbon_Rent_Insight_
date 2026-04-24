@@ -1,0 +1,7 @@
+dbt_project:
+  target: main
+  outputs:
+    main:
+      type: duckdb
+      path: "md:my_db"
+      token: "{{ env_var('motherduck_token') }}"

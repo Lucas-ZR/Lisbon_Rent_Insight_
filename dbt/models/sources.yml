@@ -1,0 +1,6 @@
+sources:
+  - name: raw
+    database: my_db
+    schema: main
+    tables:
+      - name: raw_listings
