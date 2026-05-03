@@ -5,12 +5,25 @@ from scraper.urls import make_page_urls, get_freguesia
 
 import time
 
-#to do make it support loaded page
+
+def pagination_scrape_url(driver, url, retries=3):
+    for attempt in range(retries):
+        try:
+            page = get_page(driver, url)
+            page_count = get_page_count(page)
+            listings = get_listings(page)
+            return page_count, listings
+        except ValueError:
+            time.sleep(3 * (1+attempt))
+    return None, None
+
+
+
 def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
         try:
-            raw_html = get_page(driver, url)
-            return get_listings(raw_html)
+            page = get_page(driver, url)
+            return get_listings(page)
         except ValueError:
             time.sleep(3 * (1+attempt))
     return None
@@ -32,15 +45,17 @@ def main():
     driver = setup_driver()
     failed_urls = []
 
-    #discovery
-    page = get_page(driver, url)
-    page_count = get_page_count(page)
-    urls = make_page_urls(page_count, url)
+
+
+    #support saving querying, create tables db, two tables
+    #function for connection and insertion
+    page_count, page_1_listings = pagination_scrape_url(driver, url)
+    process(page_1_listings, url)
+
+    if page_count:
+        urls = make_page_urls(page_count, url)
 
     #scraping
- #   listings = scrape_url(#pass page here)
-    process(listings, url) #processing first url straight away to not refetch
-
     for url in urls[1:]:
         listings = scrape_url(driver,url)
         process(listings, url)

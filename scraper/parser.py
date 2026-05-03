@@ -10,23 +10,28 @@ def get_page_count(raw_html):
 
     soup = BeautifulSoup(raw_html, "html.parser")
     elements = soup.find_all(class_="breadcrumb-navigation-element-info")
+    if not elements:
+        raise ValueError("No pagination element")
+
     listing_count = min([int(el.text.replace(".", "")) for el in elements])
-    pages = ceil(listing_count / 30)
-    return pages
+    
+    return ceil(listing_count / 30)
 
 
+    # every listing is a "data-element-id article" which contains "item-detail class" checking both to determine if valid page
 
-def get_listings(raw_html, freguesia):
+def get_listings(raw_html):
+
     soup = BeautifulSoup(raw_html, "html.parser")
 
     # every listing is a "data-element-id article" which contains "item-detail class" checking both to determine if valid page
     has_articles = len(soup.find_all("article", attrs={"data-element-id": True})) > 0
     has_detail = soup.find("span", class_="item-detail") is not None
+
     if not (has_articles and has_detail):
-        raise ValueError("Invalid page")
+        raise ValueError("Invalid page)")
     
-    container = soup.find(class_="items-container")
-    return parse_listings(container, freguesia)
+    return soup.find(class_="items-container")
 
 
 def parse_listings(soup, freguesia):
