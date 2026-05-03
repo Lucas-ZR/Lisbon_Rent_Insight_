@@ -1,8 +1,10 @@
 import undetected_chromedriver as uc
 import time
 
+
 def setup_driver():
     return uc.Chrome(version_main=147)
+
 
 def get_page(driver, url):
     driver.get(url)

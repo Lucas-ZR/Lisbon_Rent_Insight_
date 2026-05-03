@@ -1,4 +1,3 @@
-
 def make_page_urls(pages, freguesia_url):
     # input, number of pages containing litings and full url -> f"{BASE_URL}/{LISBON_MUNICIPALITY}/{LISBON_FREGUESUAS[0]}/" returns list of urls
     urls = [freguesia_url]
@@ -10,4 +9,4 @@ def make_page_urls(pages, freguesia_url):
 
 
 def get_freguesia(url):
-    return url.split('/')[5]
+    return url.split("/")[5]

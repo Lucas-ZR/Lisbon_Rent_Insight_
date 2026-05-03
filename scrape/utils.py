@@ -4,7 +4,6 @@ import random
 from math import ceil
 
 
-
 def get_page_count(raw_html):
     # input raw_html, return int with number of pages containing listings
 
@@ -34,9 +33,8 @@ def get_listings(raw_html):
 
     if not (has_articles and has_detail):
         raise ValueError("Invalid page)")
-    
-    return soup.find(class_="items-container") 
 
+    return soup.find(class_="items-container")
 
 
 def get_listings(raw_html):
@@ -79,7 +77,7 @@ def filter_html(soup, freguesia):
                 "price": announcement_price,
                 "title": announcement_title,
                 "extra": announcement_extra,
-                "freguesia": freguesia
+                "freguesia": freguesia,
             }
         )
 
@@ -87,4 +85,4 @@ def filter_html(soup, freguesia):
 
 
 def get_freguesia(url):
-    return url.split('/')[5]
+    return url.split("/")[5]

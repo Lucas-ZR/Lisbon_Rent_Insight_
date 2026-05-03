@@ -4,7 +4,6 @@ import random
 from math import ceil
 
 
-
 def get_page_count(raw_html):
     # input raw_html, return int with number of pages containing listings
 
@@ -14,11 +13,9 @@ def get_page_count(raw_html):
         raise ValueError("No pagination element")
 
     listing_count = min([int(el.text.replace(".", "")) for el in elements])
-    
+
     return ceil(listing_count / 30)
 
-
-    # every listing is a "data-element-id article" which contains "item-detail class" checking both to determine if valid page
 
 def get_listings(raw_html):
 
@@ -30,7 +27,7 @@ def get_listings(raw_html):
 
     if not (has_articles and has_detail):
         raise ValueError("Invalid page)")
-    
+
     return soup.find(class_="items-container")
 
 
@@ -41,9 +38,7 @@ def parse_listings(soup, freguesia):
 
     for art in articles:
         listing_id = art["data-element-id"]
-        price = art.find(
-            "span", class_="item-price h2-simulated"
-        ).get_text(strip=True)
+        price = art.find("span", class_="item-price h2-simulated").get_text(strip=True)
         title = art.find("a", class_="item-link")["title"]
         extra = [
             span.get_text(strip=True)
@@ -58,7 +53,7 @@ def parse_listings(soup, freguesia):
                 "price": price,
                 "title": title,
                 "extra": extra,
-                "freguesia": freguesia
+                "freguesia": freguesia,
             }
         )
 
