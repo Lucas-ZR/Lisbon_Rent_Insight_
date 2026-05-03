@@ -38,7 +38,7 @@ def main():
     urls = make_page_urls(page_count, url)
 
     #scraping
-    listings = scrape_url(#pass page here)
+ #   listings = scrape_url(#pass page here)
     process(listings, url) #processing first url straight away to not refetch
 
     for url in urls[1:]:
