@@ -26,6 +26,20 @@ def make_page_urls(pages, freguesia_url):
 
 
 def get_listings(raw_html):
+
+    soup = BeatifulSoup(raw_html, "html.parser")
+
+    has_articles = len(soup.find_all("article", attrs={"data-element-id": True})) > 0
+    has_detail = soup.find("span", class_="item-detail") is not None
+
+    if not (has_articles and has_detail):
+        raise ValueError("Invalid page)")
+    
+    return soup.find(class_="items-container") 
+
+
+
+def get_listings(raw_html):
     # input raw_html, return BeautifulSoup object with all the items, and scrape_status
     soup = BeautifulSoup(raw_html, "html.parser")
     container = soup.find(class_="items-container")
@@ -34,7 +48,7 @@ def get_listings(raw_html):
     return container, validation_status
 
 
-def validate_page(soup):
+def _validate_page(soup):
     # every listing is a "data-element-id article" which contains "item-detail class" checking both to determine if valid page
     has_articles = len(soup.find_all("article", attrs={"data-element-id": True})) > 0
     has_detail = soup.find("span", class_="item-detail") is not None
