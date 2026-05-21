@@ -3,7 +3,7 @@ import duckdb
 
 class DatabaseManager:
     def __init__(self, database_name, schema_name):
-        self.con = duckdb.connect("md:") 
+        self.con = duckdb.connect("md:")
         self.database_name = database_name
         self.schema_name = schema_name
 
@@ -57,10 +57,3 @@ class DatabaseManager:
             """,
             [parent_url, url, status],
         )
-
-
-
-
-
-
-

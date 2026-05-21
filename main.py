@@ -32,7 +32,7 @@ def scrape_url(driver, url, retries=3):
 
 def process(bs4_listings, parent_url, url, con, database_name, schema_name):
     status = "failure"
-    
+
     if bs4_listings:
         listings_list = parse_listings(bs4_listings, get_freguesia(url))
         write_listings(listings_list, con, database_name, schema_name)
@@ -67,7 +67,7 @@ def main():
     page_count, page_1_listings = pagination_scrape_url(driver, url)
     process(page_1_listings, url)
 
-    #continue from here pushing firt handling make urls, rpocessing without loop yet
+    # continue from here pushing firt handling make urls, rpocessing without loop yet
     if page_count:
         urls = make_page_urls(page_count, url)
 
