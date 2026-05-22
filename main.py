@@ -57,7 +57,7 @@ def main():
 
         # setup driver and urls
         driver = setup_driver()
-        url = "https://www.google.com/"
+        url = r"https://www.idealista.pt/comprar-casas/alges-linda-a-velha-cruz-quebrada-dafundo/alges/"
 
         # first URL
         page_count, page_1_listings = pagination_scrape_url(driver, url)
@@ -79,5 +79,5 @@ if __name__ == "__main__":
 
 
 # to do
-# pick arrendado from tags add to extra
+# pick arrendado from tags add
 # support saving itself

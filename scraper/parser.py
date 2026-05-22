@@ -40,19 +40,34 @@ def parse_listings(soup, freguesia):
         listing_id = art["data-element-id"]
         price = art.find("span", class_="item-price h2-simulated").get_text(strip=True)
         title = art.find("a", class_="item-link")["title"]
-        extra = [
-            span.get_text(strip=True)
-            for span in art.find("div", class_="item-detail-char").find_all(
-                "span", class_="item-detail"
-            )
-        ]
+
+        detail_container = art.find("div", class_="item-detail-char")
+        detail = (
+            [
+                span.get_text(strip=True)
+                for span in detail_container.find_all("span", class_="item-detail")
+            ]
+            if detail_container
+            else []
+        )
+
+        tag_container = art.find("div", class_="listing-tags-container")
+        tags = (
+            [
+                span.get_text(strip=True)
+                for span in tag_container.find_all("span", class_="listing-tags")
+            ]
+            if tag_container
+            else []
+        )
 
         listings.append(
             {
                 "id": listing_id,
                 "price": price,
                 "title": title,
-                "extra": extra,
+                "detail": detail,
+                "tags": tags,
                 "freguesia": freguesia,
             }
         )

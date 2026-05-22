@@ -21,7 +21,8 @@ class DatabaseManager:
                 id VARCHAR,
                 price VARCHAR,
                 title VARCHAR,
-                extra VARCHAR[],
+                detail VARCHAR[],
+                tags VARCHAR,
                 freguesia VARCHAR,
                 scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -39,12 +40,19 @@ class DatabaseManager:
         self.con.executemany(
             f"""
             INSERT INTO {self.database_name}.{self.schema_name}.raw_listings
-                (id, price, title, extra, freguesia)
+                (id, price, title, detail, tags, freguesia)
             VALUES 
-                (?,?,?,?,?)
+                (?,?,?,?,?,?)
             """,
             [
-                [d["id"], d["price"], d["title"], d["extra"], d["freguesia"]]
+                [
+                    d["id"],
+                    d["price"],
+                    d["title"],
+                    d["detail"],
+                    d["tags"],
+                    d["freguesia"],
+                ]
                 for d in listings
             ],
         )
