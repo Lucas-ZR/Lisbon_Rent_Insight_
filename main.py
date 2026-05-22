@@ -30,59 +30,52 @@ def scrape_url(driver, url, retries=3):
     return None
 
 
-def process(bs4_listings, parent_url, url, con, database_name, schema_name):
+def process(bs4_listings, parent_url, url, db):
     status = "failure"
 
     if bs4_listings:
         listings_list = parse_listings(bs4_listings, get_freguesia(url))
-        write_listings(listings_list, con, database_name, schema_name)
+        db.write_listings(listings_list)
         status = "success"
 
-    write_job_state(
+    db.write_job_state(
         parent_url=parent_url,
         url=url,
         status=status,
-        con=con,
-        database_name=database_name,
-        schema_name=schema_name,
     )
 
 
 def main():
 
     # setup db
-    load_dotenv()
+    load_dotenv(".env.test")
     database_name = os.getenv("database_name")
     schema_name = os.getenv("schema_name")
 
-    # setup db
     with DatabaseManager(database_name, schema_name) as db:
         db.init_schema()
 
-    # setup driver and urls
-    driver = setup_driver()
-    url = "https://www.idealista.pt/arrendar-casas/lisboa/ajuda/"
+        # setup driver and urls
+        driver = setup_driver()
+        url = "https://www.google.com/"
 
-    # function for connection and insertion
-    page_count, page_1_listings = pagination_scrape_url(driver, url)
-    process(page_1_listings, url)
+        #first URL
+        page_count, page_1_listings = pagination_scrape_url(driver, url)
+        process(page_1_listings, url, url, db)
+'''
+        if page_count:
+            child_urls = make_page_urls(page_count, url)
 
-    # continue from here pushing firt handling make urls, rpocessing without loop yet
-    if page_count:
-        urls = make_page_urls(page_count, url)
-
-    # scraping
-    for url in urls[1:]:
-        listings = scrape_url(driver, url)
-        process(listings, url)
-
+        # scraping
+        for url in urls[1:]:
+            listings = scrape_url(driver, url)
+            process(listings, url, child_url, db)
+'''
 
 if __name__ == "__main__":
     main()
 
 
 # to do
-# parse listings, handle none?
 # pick arrendado from tags add to extra
 # support saving itself
-# check what happens on failure just for ...

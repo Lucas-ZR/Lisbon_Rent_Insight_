@@ -3,7 +3,7 @@ import duckdb
 
 class DatabaseManager:
     def __init__(self, database_name, schema_name):
-        self.con = duckdb.connect("md:")
+        self.con = duckdb.connect("md:") #picks motherduck_token from env automatically
         self.database_name = database_name
         self.schema_name = schema_name
 
@@ -48,7 +48,7 @@ class DatabaseManager:
         )
 
     def write_job_state(self, parent_url, url, status):
-        self.con.sql(
+        self.con.execute(
             f"""
             INSERT INTO {self.database_name}.{self.schema_name}.scrape_jobs
                 (parent_url, url, status)
