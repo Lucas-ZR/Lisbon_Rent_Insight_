@@ -3,7 +3,9 @@ import duckdb
 
 class DatabaseManager:
     def __init__(self, database_name, schema_name):
-        self.con = duckdb.connect("md:") #picks motherduck_token from env automatically
+        self.con = duckdb.connect(
+            "md:"
+        )  # picks motherduck_token from env automatically
         self.database_name = database_name
         self.schema_name = schema_name
 

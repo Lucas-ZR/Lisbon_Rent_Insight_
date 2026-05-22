@@ -59,10 +59,12 @@ def main():
         driver = setup_driver()
         url = "https://www.google.com/"
 
-        #first URL
+        # first URL
         page_count, page_1_listings = pagination_scrape_url(driver, url)
         process(page_1_listings, url, url, db)
-'''
+
+
+"""
         if page_count:
             child_urls = make_page_urls(page_count, url)
 
@@ -70,7 +72,7 @@ def main():
         for url in urls[1:]:
             listings = scrape_url(driver, url)
             process(listings, url, child_url, db)
-'''
+"""
 
 if __name__ == "__main__":
     main()
