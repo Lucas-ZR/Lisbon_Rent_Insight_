@@ -1,6 +1,6 @@
 from scraper.browser import setup_driver, get_page
 from scraper.parser import get_page_count, get_listings, parse_listings
-from scraper.urls import make_page_urls, get_freguesia
+from scraper.urls import make_page_urls, get_freguesia, make_base_urls
 from db.init import DatabaseManager
 
 import time
@@ -32,6 +32,7 @@ def scrape_url(driver, url, retries=3):
 
 def process(bs4_listings, parent_url, url, db):
     status = "failure"
+    print(f"processing {url}")
 
     if bs4_listings:
         listings_list = parse_listings(bs4_listings, get_freguesia(url))
@@ -57,22 +58,19 @@ def main():
 
         # setup driver and urls
         driver = setup_driver()
-        url = r"https://www.idealista.pt/comprar-casas/alges-linda-a-velha-cruz-quebrada-dafundo/alges/"
+        parent_urls = make_base_urls()
 
-        # first URL
-        page_count, page_1_listings = pagination_scrape_url(driver, url)
-        process(page_1_listings, url, url, db)
+        for url in parent_urls:
+            # first URL
+            page_count, page_1_listings = pagination_scrape_url(driver, url)
+            process(page_1_listings, url, url, db)
+            if page_count:
+                child_urls = make_page_urls(page_count, url)
 
+                for child_url in child_urls:
+                    listings = scrape_url(driver, child_url)
+                    process(listings, url, child_url, db)
 
-"""
-        if page_count:
-            child_urls = make_page_urls(page_count, url)
-
-        # scraping
-        for url in urls[1:]:
-            listings = scrape_url(driver, url)
-            process(listings, url, child_url, db)
-"""
 
 if __name__ == "__main__":
     main()
