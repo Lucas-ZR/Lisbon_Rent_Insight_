@@ -32,6 +32,7 @@ class DatabaseManager:
                 parent_url VARCHAR,
                 url VARCHAR,
                 status VARCHAR,
+                page_count INTEGER,
                 scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
