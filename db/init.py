@@ -58,13 +58,23 @@ class DatabaseManager:
             ],
         )
 
-    def write_job_state(self, parent_url, url, status):
+    def write_job_state(self, parent_url, url, status, page_count=None):
         self.con.execute(
             f"""
             INSERT INTO {self.database_name}.{self.schema_name}.scrape_jobs
-                (parent_url, url, status)
+                (parent_url, url, status, page_count)
             VALUES
-                (? ,? ,?)
+                (? ,? ,?, ?)
             """,
-            [parent_url, url, status],
+            [parent_url, url, status, page_count],
+        )
+
+    def already_loaded_urls(self):
+        self.con.execute(
+            f"""
+            SELECT
+                url
+            FROM {self.database_name}.{self.schema_name}.raw_listings
+            
+            """
         )

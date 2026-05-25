@@ -30,7 +30,7 @@ def scrape_url(driver, url, retries=3):
     return None
 
 
-def process(bs4_listings, parent_url, url, db):
+def process(bs4_listings, parent_url, url, db, page_count=None):
     status = "failure"
     print(f"processing {url}")
 
@@ -43,6 +43,7 @@ def process(bs4_listings, parent_url, url, db):
         parent_url=parent_url,
         url=url,
         status=status,
+        page_count=page_count,
     )
 
 
@@ -60,10 +61,10 @@ def main():
         driver = setup_driver()
         parent_urls = make_base_urls()
 
-        for url in parent_urls:
+        for url in parent_urls: #probably use a child_url set to true inside here and make scrape_url a single function...
             # first URL
             page_count, page_1_listings = pagination_scrape_url(driver, url)
-            process(page_1_listings, url, url, db)
+            process(page_1_listings, url, url, db, page_count)
             if page_count:
                 child_urls = make_page_urls(page_count, url)
 
@@ -77,5 +78,4 @@ if __name__ == "__main__":
 
 
 # to do
-# pick arrendado from tags add
 # support saving itself
