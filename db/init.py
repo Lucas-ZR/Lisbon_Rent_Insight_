@@ -72,9 +72,44 @@ class DatabaseManager:
     def already_loaded_urls(self):
         self.con.execute(
             f"""
+            WITH success_this_month AS (
+            SELECT
+                *
+            FROM "lisbon_rental"."test"."scrape_jobs"
+            WHERE 
+                status = 'success'
+            AND
+                DATE_TRUNC('month', scraped_at) = DATE_TRUNC('month', CURRENT_DATE)
+            ),
+
+            done_child_urls AS (
             SELECT
                 url
-            FROM {self.database_name}.{self.schema_name}.raw_listings
-            
+            FROM success_this_month
+            WHERE 
+                page_count IS NULL
+            ),
+
+            parent_url_count AS (
+            SELECT
+                parent_url,
+                COUNT(url) AS parent_count
+            FROM success_this_month
+            GROUP BY parent_url
+            ),
+
+            done_parent_urls AS (
+            SELECT 
+            parent_url_count.parent_url
+            FROM parent_url_count
+            JOIN success_this_month 
+            ON 
+                parent_url_count.parent_url=success_this_month.parent_url 
+            AND 
+                success_this_month.page_count IS NOT NULL
+            WHERE parent_count = page_count
+            )
+
+            SELECT * FROM done_child_urls UNION ALL SELECT * FROM done_parent_urls
             """
         )
