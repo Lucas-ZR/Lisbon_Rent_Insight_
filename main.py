@@ -1,11 +1,12 @@
+import os
+import time
+
+from dotenv import load_dotenv
+
 from scraper.browser import setup_driver, get_page
 from scraper.parser import get_page_count, get_listings, parse_listings
 from scraper.urls import make_page_urls, get_freguesia, make_base_urls
 from db.init import DatabaseManager
-
-import time
-import os
-from dotenv import load_dotenv
 
 
 def scrape_url(driver, url, retries=3):
@@ -20,10 +21,9 @@ def scrape_url(driver, url, retries=3):
     return None, None
 
 
-
 def process(bs4_listings, parent_url, url, db, page_count=None):
     status = "failure"
-    print(f"processing {url}")
+    print(f"Processing {url}")
 
     if bs4_listings:
         listings_list = parse_listings(bs4_listings, get_freguesia(url))
@@ -39,7 +39,6 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
 
 
 def main():
-
     # setup db
     load_dotenv(".env.test")
     database_name = os.getenv("database_name")
@@ -51,15 +50,24 @@ def main():
         # setup driver and urls
         driver = setup_driver()
         parent_urls = make_base_urls()
+        already_scraped = db.get_already_scraped()
 
-        for url in parent_urls: 
-            # first URL
-            parent_url_listings, page_count = scrape_url(driver, url)
-            process(parent_url_listings, url, url, db, page_count)
+        for url in parent_urls:
+            if url in already_scraped:
+                page_count = already_scraped[url]
+                print(f"Skipping {url}")
+            else:
+                parent_url_listings, page_count = scrape_url(driver, url)
+                process(parent_url_listings, url, url, db, page_count)
+
             if page_count:
                 child_urls = make_page_urls(page_count, url)
 
                 for child_url in child_urls:
+                    if child_url in already_scraped:
+                        print(f"Skipping {child_url}")
+                        continue
+
                     child_url_listings, _ = scrape_url(driver, child_url)
                     process(child_url_listings, url, child_url, db)
 

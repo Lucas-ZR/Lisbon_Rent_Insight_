@@ -1,7 +1,6 @@
 from time import sleep
 
 
-
 proxy = f"http://{PROXY_USERNAME}:{PASSWORD}@{DOMAIN_NAME}:{PORT}"
 
 import json, tempfile
@@ -31,7 +30,7 @@ chrome.webRequest.onAuthRequired.addListener(
 
 options = uc.ChromeOptions()
 options.add_argument(f"--load-extension={ext}")
-options.add_argument("--blink-settings=imagesEnabled=false") #save on bandwidth
+options.add_argument("--blink-settings=imagesEnabled=false")  # save on bandwidth
 driver = uc.Chrome(options=options, version_main=147)
 sleep(5)
 
