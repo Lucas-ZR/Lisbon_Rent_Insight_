@@ -54,6 +54,7 @@ def main():
 
         for url in parent_urls:
             if url in already_scraped:
+                # if already scraped, reuse page_count skipping re-scraping
                 page_count = already_scraped[url]
                 print(f"Skipping {url}")
             else:
@@ -63,7 +64,7 @@ def main():
             if page_count:
                 child_urls = make_page_urls(page_count, url)
 
-                for child_url in child_urls:
+                for child_url in child_urls:  # always builds child_urls and checks, a bit inneficient but simple enough for Lisbon only its fine
                     if child_url in already_scraped:
                         print(f"Skipping {child_url}")
                         continue
