@@ -39,7 +39,6 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
 
 
 def main():
-    # setup db
     load_dotenv(".env.test")
     database_name = os.getenv("database_name")
     schema_name = os.getenv("schema_name")
@@ -54,7 +53,7 @@ def main():
 
         for url in parent_urls:
             if url in already_scraped:
-                # if already scraped, reuse page_count skipping re-scraping
+                # if already scraped, reuse page_count, skip re-scraping
                 page_count = already_scraped[url]
                 print(f"Skipping {url}")
             else:
@@ -64,7 +63,7 @@ def main():
             if page_count:
                 child_urls = make_page_urls(page_count, url)
 
-                for child_url in child_urls:  # always builds child_urls and checks, a bit inneficient but simple enough for Lisbon only its fine
+                for child_url in child_urls:  # always build child_urls and checks, a bit inneficient but simple enough
                     if child_url in already_scraped:
                         print(f"Skipping {child_url}")
                         continue
@@ -75,7 +74,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# to do
-# support saving itself
