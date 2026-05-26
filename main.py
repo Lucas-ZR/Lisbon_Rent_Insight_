@@ -8,26 +8,17 @@ import os
 from dotenv import load_dotenv
 
 
-def pagination_scrape_url(driver, url, retries=3):
+def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
         try:
             page = get_page(driver, url)
             page_count = get_page_count(page)
             listings = get_listings(page)
-            return page_count, listings
+            return listings, page_count
         except ValueError:
             time.sleep(3 * (1 + attempt))
     return None, None
 
-
-def scrape_url(driver, url, retries=3):
-    for attempt in range(retries):
-        try:
-            page = get_page(driver, url)
-            return get_listings(page)
-        except ValueError:
-            time.sleep(3 * (1 + attempt))
-    return None
 
 
 def process(bs4_listings, parent_url, url, db, page_count=None):
@@ -61,16 +52,16 @@ def main():
         driver = setup_driver()
         parent_urls = make_base_urls()
 
-        for url in parent_urls: #probably use a child_url set to true inside here and make scrape_url a single function...
+        for url in parent_urls: 
             # first URL
-            page_count, page_1_listings = pagination_scrape_url(driver, url)
-            process(page_1_listings, url, url, db, page_count)
+            parent_url_listings, page_count = scrape_url(driver, url)
+            process(parent_url_listings, url, url, db, page_count)
             if page_count:
                 child_urls = make_page_urls(page_count, url)
 
                 for child_url in child_urls:
-                    listings = scrape_url(driver, child_url)
-                    process(listings, url, child_url, db)
+                    child_url_listings, _ = scrape_url(driver, child_url)
+                    process(child_url_listings, url, child_url, db)
 
 
 if __name__ == "__main__":
