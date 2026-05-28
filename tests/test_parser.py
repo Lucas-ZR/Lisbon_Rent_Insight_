@@ -19,7 +19,7 @@ def test_get_listings_no_page(empty_page):
 def test_parse_listings(lisboa_ajuda_page1):
     container = get_listings(lisboa_ajuda_page1)
     listings = parse_listings(container, freguesia="ajuda")
-    assert len(listings) > 0
+    assert len(listings) >= 1
     assert listings[0].keys() == {"id", "price", "title", "detail", "tags", "freguesia"}
 
     

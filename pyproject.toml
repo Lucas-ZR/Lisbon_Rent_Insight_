@@ -10,6 +10,7 @@ dependencies = [
     "dbt-duckdb>=1.10.1",
     "duckdb>=1.5.2",
     "python-dotenv>=1.2.2",
+    "selenium>=4.43.0",
     "undetected-chromedriver>=3.5.5",
 ]
 

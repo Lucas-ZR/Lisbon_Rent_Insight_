@@ -8,6 +8,8 @@ from scraper.parser import get_page_count, get_listings, parse_listings
 from scraper.urls import make_page_urls, get_freguesia, make_base_urls
 from db.init import DatabaseManager
 
+from selenium.common.exceptions import TimeoutException
+
 
 def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
@@ -16,7 +18,7 @@ def scrape_url(driver, url, retries=3):
             page_count = get_page_count(page)
             listings = get_listings(page)
             return listings, page_count
-        except ValueError:
+        except (ValueError, TimeoutException):
             time.sleep(3 * (1 + attempt))
     return None, None
 
