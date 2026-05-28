@@ -14,7 +14,7 @@ from selenium.common.exceptions import TimeoutException
 def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
         try:
-            page = smart_get_page(driver, url, wait=True)
+            page = smart_get_page(driver, url, wait=None)
             page_count = get_page_count(page)
             listings = get_listings(page)
             return listings, page_count
@@ -41,15 +41,30 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
 
 
 def main():
-    load_dotenv(".env")
-    database_name = os.getenv("database_name")
-    schema_name = os.getenv("schema_name")
+    # db
+    load_dotenv(".env.test")
+    database_name, schema_name = os.getenv("database_name"), os.getenv("schema_name")
+
+    # proxy
+    proxy_username, password, domain_name, port = (
+        os.getenv("PROXY_USERNAME"),
+        os.getenv("PASSWORD"),
+        os.getenv("DOMAIN_NAME"),
+        os.getenv("PORT"),
+    )
 
     with DatabaseManager(database_name, schema_name) as db:
         db.init_schema()
 
         # setup driver and urls
-        driver = setup_driver()
+        driver = setup_driver(
+            driver_version=147,
+            use_proxy=True,
+            PROXY_USERNAME=proxy_username,
+            PASSWORD=password,
+            DOMAIN_NAME=domain_name,
+            PORT=port,
+        )
         parent_urls = make_base_urls()
         already_scraped = db.get_already_scraped()
 
