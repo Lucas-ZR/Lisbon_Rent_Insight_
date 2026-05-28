@@ -8,3 +8,4 @@ logs
 .claude
 .env.webshare
 *.egg-info/
+.pytest_cache
