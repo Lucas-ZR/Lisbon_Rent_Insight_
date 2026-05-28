@@ -3,7 +3,7 @@ import time
 
 from dotenv import load_dotenv
 
-from scraper.browser import setup_driver, get_page
+from scraper.browser import setup_driver, smart_get_page
 from scraper.parser import get_page_count, get_listings, parse_listings
 from scraper.urls import make_page_urls, get_freguesia, make_base_urls
 from db.init import DatabaseManager
@@ -14,7 +14,7 @@ from selenium.common.exceptions import TimeoutException
 def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
         try:
-            page = get_page(driver, url)
+            page = smart_get_page(driver, url, wait=True)
             page_count = get_page_count(page)
             listings = get_listings(page)
             return listings, page_count
@@ -41,7 +41,7 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
 
 
 def main():
-    load_dotenv(".env.test")
+    load_dotenv(".env")
     database_name = os.getenv("database_name")
     schema_name = os.getenv("schema_name")
 
