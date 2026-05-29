@@ -1,6 +1,6 @@
 sources:
   - name: raw
-    database: my_db
+    database: lisbon_rental
     schema: main
     tables:
       - name: raw_listings

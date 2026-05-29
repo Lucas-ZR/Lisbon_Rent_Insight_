@@ -3,5 +3,5 @@ dbt_project:
   outputs:
     main:
       type: duckdb
-      path: "md:my_db"
+      path: "md:lisbon_rental"
       token: "{{ env_var('motherduck_token') }}"
