@@ -10,3 +10,5 @@ static/data
 .evidence/meta
 .vscode
 .evidence
+.npmrc
+sources/md/connection.yaml
