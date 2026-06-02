@@ -1,56 +1,31 @@
 ---
-title: Welcome to Evidence
+title: Test
 ---
 
-<Details title='How to edit this page'>
-
-  This page can be found in your project at `/pages/index.md`. Make a change to the markdown file and save it to see the change take effect in your browser.
-</Details>
-
-```sql categories
-  select
-      category
-  from needful_things.orders
-  group by category
+```sql first_50
+select
+    *
+from raw_listings
+LIMIT 50
 ```
 
-<Dropdown data={categories} name=category value=category>
-    <DropdownOption value="%" valueLabel="All Categories"/>
-</Dropdown>
+<DataTable data={first_50} />
 
-<Dropdown name=year>
-    <DropdownOption value=% valueLabel="All Years"/>
-    <DropdownOption value=2019/>
-    <DropdownOption value=2020/>
-    <DropdownOption value=2021/>
-</Dropdown>
-
-```sql orders_by_category
-  select 
-      date_trunc('month', order_datetime) as month,
-      sum(sales) as sales_usd,
-      category
-  from needful_things.orders
-  where category like '${inputs.category.value}'
-  and date_part('year', order_datetime) like '${inputs.year.value}'
-  group by all
-  order by sales_usd desc
+```sql listings_by_freguesia
+select
+    *
+from cleaned_listings
 ```
-
-<BarChart
-    data={orders_by_category}
-    title="Sales by Month, {inputs.category.label}"
-    x=month
-    y=sales_usd
-    series=category
+<AreaMap
+    data={listings_by_freguesia}
+    areaCol=geoJSON
+    geoJsonUrl='/freguesias.geojson'
+    geoId=NOME
+    value=listings_count
+    valueFmt=num0
+    height=400
+    basemap={`https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png`}
+    startingLat=38.7223
+    startingLong=-9.1393
+    startingZoom=12
 />
-
-## What's Next?
-- [Connect your data sources](settings)
-- Edit/add markdown files in the `pages` folder
-- Deploy your project with [Evidence Cloud](https://evidence.dev/cloud)
-
-## Get Support
-- Message us on [Slack](https://slack.evidence.dev/)
-- Read the [Docs](https://docs.evidence.dev/)
-- Open an issue on [Github](https://github.com/evidence-dev/evidence)
