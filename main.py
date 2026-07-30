@@ -1,6 +1,8 @@
 import os
 import time
 
+import logging
+
 from dotenv import load_dotenv
 
 from scraper.browser import setup_driver, smart_get_page
@@ -18,14 +20,18 @@ def scrape_url(driver, url, retries=3):
             page_count = get_page_count(page)
             listings = get_listings(page)
             return listings, page_count
-        except (ValueError, TimeoutException):
+        except (ValueError, TimeoutException) as exc:
+            logger.warning("attempt %d/%d failed for %s: %s", attempt + 1, retries, url, exc)
             time.sleep(3 * (1 + attempt))
+
+    logger.error("giving up on %s", url)
     return None, None
 
 
 def process(bs4_listings, parent_url, url, db, page_count=None):
+    logger.info("processing %s", url)
+    
     status = "failure"
-    print(f"Processing {url}")
 
     if bs4_listings:
         listings_list = parse_listings(bs4_listings, get_freguesia(url))
@@ -38,9 +44,19 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
         status=status,
         page_count=page_count,
     )
+    
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(name)s %(funcName)s — %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler("scrape.log")],
+)
+
+logger = logging.getLogger(__name__)
 
 def main():
+    logger.info("Initializing run")
+
     # db
     load_dotenv(".env.test")
     database_name, schema_name = os.getenv("database_name"), os.getenv("schema_name")
@@ -58,7 +74,7 @@ def main():
 
         # setup driver and urls
         driver = setup_driver(
-            driver_version=147,
+            driver_version=150,
             use_proxy=True,
             PROXY_USERNAME=proxy_username,
             PASSWORD=password,
@@ -72,7 +88,7 @@ def main():
             if url in already_scraped:
                 # if already scraped, reuse page_count, skip re-scraping
                 page_count = already_scraped[url]
-                print(f"Skipping {url}")
+                logger.info("skipping %s", url)
             else:
                 parent_url_listings, page_count = scrape_url(driver, url)
                 process(parent_url_listings, url, url, db, page_count)
@@ -82,12 +98,14 @@ def main():
 
                 for child_url in child_urls:  # always build child_urls and checks, a bit inneficient but simple enough
                     if child_url in already_scraped:
-                        print(f"Skipping {child_url}")
+                        logger.info("skipping %s", child_url)
                         continue
 
                     child_url_listings, _ = scrape_url(driver, child_url)
                     process(child_url_listings, url, child_url, db)
+        logger.info("Run finished")
 
+        
 
 if __name__ == "__main__":
     main()

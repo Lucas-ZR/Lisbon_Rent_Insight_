@@ -9,3 +9,4 @@ logs
 .env.webshare
 *.egg-info/
 .pytest_cache
+scrape.log
