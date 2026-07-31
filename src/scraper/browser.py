@@ -1,7 +1,8 @@
 import undetected_chromedriver as uc
 import time
 import random
-import json, tempfile
+import json
+import tempfile
 from urllib.parse import urlparse
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
