@@ -12,13 +12,13 @@ from selenium.webdriver.common.by import By
 def setup_driver(
     driver_version=None,
     use_proxy=None,
-    PROXY_USERNAME=None,
-    PASSWORD=None,
-    DOMAIN_NAME=None,
-    PORT=None,
+    proxy_username=None,
+    password=None,
+    domain_name=None,
+    port=None,
 ):
     if use_proxy:
-        proxy = f"http://{PROXY_USERNAME}:{PASSWORD}@{DOMAIN_NAME}:{PORT}"
+        proxy = f"http://{proxy_username}:{password}@{domain_name}:{port}"
 
         p = urlparse(proxy)
 

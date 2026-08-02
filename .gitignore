@@ -9,4 +9,7 @@ logs
 .env.webshare
 *.egg-info/
 .pytest_cache
+scrape.log.vscode
+.vscode
+notebooks
 scrape.log

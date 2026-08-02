@@ -12,6 +12,15 @@ from db.init import DatabaseManager
 
 from selenium.common.exceptions import TimeoutException
 
+from config import Settings
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(name)s %(funcName)s — %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler("scrape.log")],
+)
+
+logger = logging.getLogger(__name__)
 
 def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
@@ -21,9 +30,7 @@ def scrape_url(driver, url, retries=3):
             listings = get_listings(page)
             return listings, page_count
         except (ValueError, TimeoutException) as exc:
-            logger.warning(
-                "attempt %d/%d failed for %s: %s", attempt + 1, retries, url, exc
-            )
+            logger.warning("attempt %d/%d failed for %s: %s", attempt + 1, retries, url, exc)
             time.sleep(3 * (1 + attempt))
 
     logger.error("giving up on %s", url)
@@ -32,7 +39,7 @@ def scrape_url(driver, url, retries=3):
 
 def process(bs4_listings, parent_url, url, db, page_count=None):
     logger.info("processing %s", url)
-
+    
     status = "failure"
 
     if bs4_listings:
@@ -46,43 +53,26 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
         status=status,
         page_count=page_count,
     )
-
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)-8s %(name)s %(funcName)s — %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("scrape.log")],
-)
-
-logger = logging.getLogger(__name__)
+    
 
 
 def main():
     logger.info("Initializing run")
 
-    # db
-    load_dotenv(".env.test")
-    database_name, schema_name = os.getenv("database_name"), os.getenv("schema_name")
+    #vars
+    settings=Settings()
 
-    # proxy
-    proxy_username, password, domain_name, port = (
-        os.getenv("PROXY_USERNAME"),
-        os.getenv("PASSWORD"),
-        os.getenv("DOMAIN_NAME"),
-        os.getenv("PORT"),
-    )
-
-    with DatabaseManager(database_name, schema_name) as db:
+    with DatabaseManager(settings.database_name, settings.schema_name, settings.motherduck_token) as db:
         db.init_schema()
 
         # setup driver and urls
         driver = setup_driver(
             driver_version=150,
             use_proxy=True,
-            PROXY_USERNAME=proxy_username,
-            PASSWORD=password,
-            DOMAIN_NAME=domain_name,
-            PORT=port,
+            proxy_username=settings.proxy_username,
+            password=settings.password,
+            domain_name=settings.domain_name,
+            port=settings.port,
         )
         parent_urls = make_base_urls()
         already_scraped = db.get_already_scraped()
@@ -108,6 +98,7 @@ def main():
                     process(child_url_listings, url, child_url, db)
         logger.info("Run finished")
 
+        
 
 if __name__ == "__main__":
     main()

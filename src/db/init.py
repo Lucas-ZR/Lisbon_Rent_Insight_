@@ -2,10 +2,8 @@ import duckdb
 
 
 class DatabaseManager:
-    def __init__(self, database_name, schema_name):
-        self.con = duckdb.connect(
-            "md:"
-        )  # picks motherduck_token from env automatically
+    def __init__(self, database_name, schema_name, motherduck_token):
+        self.con = duckdb.connect(f"md:?motherduck_token={motherduck_token}")
         self.database_name = database_name
         self.schema_name = schema_name
 
@@ -84,3 +82,6 @@ class DatabaseManager:
         ).fetchall()
 
         return {url: page_count for url, page_count in rows}
+
+
+
