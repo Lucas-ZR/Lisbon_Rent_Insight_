@@ -13,3 +13,4 @@ scrape.log.vscode
 .vscode
 notebooks
 scrape.log
+.mypy_cache

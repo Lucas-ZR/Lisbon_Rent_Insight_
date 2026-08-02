@@ -6,7 +6,7 @@ import logging
 from scraper.browser import setup_driver, smart_get_page
 from scraper.parser import get_page_count, get_listings, parse_listings
 from scraper.urls import make_page_urls, get_freguesia, make_base_urls
-from db.init import DatabaseManager
+from db.database import DatabaseManager
 
 from selenium.common.exceptions import TimeoutException
 
