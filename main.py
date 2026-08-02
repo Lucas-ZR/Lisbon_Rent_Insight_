@@ -1,9 +1,7 @@
-import os
 import time
 
 import logging
 
-from dotenv import load_dotenv
 
 from scraper.browser import setup_driver, smart_get_page
 from scraper.parser import get_page_count, get_listings, parse_listings
