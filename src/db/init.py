@@ -82,6 +82,3 @@ class DatabaseManager:
         ).fetchall()
 
         return {url: page_count for url, page_count in rows}
-
-
-

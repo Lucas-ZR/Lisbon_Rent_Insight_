@@ -20,6 +20,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
 def scrape_url(driver, url, retries=3):
     for attempt in range(retries):
         try:
@@ -28,7 +29,9 @@ def scrape_url(driver, url, retries=3):
             listings = get_listings(page)
             return listings, page_count
         except (ValueError, TimeoutException) as exc:
-            logger.warning("attempt %d/%d failed for %s: %s", attempt + 1, retries, url, exc)
+            logger.warning(
+                "attempt %d/%d failed for %s: %s", attempt + 1, retries, url, exc
+            )
             time.sleep(3 * (1 + attempt))
 
     logger.error("giving up on %s", url)
@@ -37,7 +40,7 @@ def scrape_url(driver, url, retries=3):
 
 def process(bs4_listings, parent_url, url, db, page_count=None):
     logger.info("processing %s", url)
-    
+
     status = "failure"
 
     if bs4_listings:
@@ -51,16 +54,17 @@ def process(bs4_listings, parent_url, url, db, page_count=None):
         status=status,
         page_count=page_count,
     )
-    
 
 
 def main():
     logger.info("Initializing run")
 
-    #vars
-    settings=Settings()
+    # vars
+    settings = Settings()
 
-    with DatabaseManager(settings.database_name, settings.schema_name, settings.motherduck_token) as db:
+    with DatabaseManager(
+        settings.database_name, settings.schema_name, settings.motherduck_token
+    ) as db:
         db.init_schema()
 
         # setup driver and urls
@@ -96,7 +100,6 @@ def main():
                     process(child_url_listings, url, child_url, db)
         logger.info("Run finished")
 
-        
 
 if __name__ == "__main__":
     main()
